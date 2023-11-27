@@ -5,6 +5,8 @@ use derive_builder::Builder;
 #[derive(Debug, Builder)]
 #[builder(derive(serde::Deserialize))]
 pub struct Config {
+    #[builder(default = "\"main\".to_string()")]
+    pub git_branch: String,
     pub git_repo: String,
     #[builder(default = "3000")]
     pub port: u16,
