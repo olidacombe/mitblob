@@ -6,6 +6,8 @@ use derive_builder::Builder;
 #[builder(derive(serde::Deserialize))]
 pub struct Config {
     pub git_repo: String,
+    #[builder(default = "3000")]
+    pub port: u16,
 }
 
 /// Gets app config from config files and the environment
