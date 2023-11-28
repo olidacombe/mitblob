@@ -68,7 +68,7 @@ impl<'de> Deserialize<'de> for Repo {
             }
         }
 
-        deserializer.deserialize_enum("Repo", &["GitHub", "GitLab"], FieldVisitor {})
+        deserializer.deserialize_string(FieldVisitor {})
     }
 }
 
@@ -97,6 +97,13 @@ mod test {
     fn deserialize_github_repo_https() -> Result<()> {
         let deserialized: Repo = serde_json::from_str("\"https://github.com/olidacombe/mitblob\"")?;
         assert_eq!(deserialized, Repo::GitHub("olidacombe/mitblob".to_string()));
+        Ok(())
+    }
+
+    #[test]
+    fn deserialize_gitlab_repo_https() -> Result<()> {
+        let deserialized: Repo = serde_json::from_str("\"https://gitlab.com/olidacombe/mitblob\"")?;
+        assert_eq!(deserialized, Repo::GitLab("olidacombe/mitblob".to_string()));
         Ok(())
     }
 }
