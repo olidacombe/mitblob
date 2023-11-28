@@ -2,12 +2,14 @@ use std::sync::OnceLock;
 
 use derive_builder::Builder;
 
+use crate::git::Repo;
+
 #[derive(Debug, Builder)]
 #[builder(derive(serde::Deserialize))]
 pub struct Config {
     #[builder(default = "\"main\".to_string()")]
     pub git_branch: String,
-    pub git_repo: String,
+    pub git_repo: Repo,
     #[builder(default = "3000")]
     pub port: u16,
 }
