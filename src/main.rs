@@ -8,7 +8,13 @@ async fn main() {
     // build our application with a single route
     let app = Router::new().route(
         "/",
-        get(|| async { config.git_repo.latest_commit(config.git_branch.as_str()) }),
+        get(|| async {
+            config
+                .git_repo
+                .latest_commit(config.git_branch.as_str())
+                .await
+                .unwrap_or_else(|e| e.to_string())
+        }),
     );
 
     // run our app with hyper, listening globally on port 3000

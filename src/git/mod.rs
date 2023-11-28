@@ -1,5 +1,6 @@
 use std::fmt;
 
+use color_eyre::Result;
 use regex::Regex;
 use serde::de::{Deserialize, Deserializer, Error, Visitor};
 
@@ -13,10 +14,12 @@ pub enum Repo {
 }
 
 impl Repo {
-    pub fn latest_commit(&self, branch: &str) -> String {
+    pub async fn latest_commit(&self, branch: &str) -> Result<String> {
         match self {
-            Self::GitHub(repo) => github::latest_commit(repo, branch),
-            Self::GitLab(repo) => gitlab::latest_commit(repo, branch),
+            Self::GitHub(repo) => github::latest_commit(repo, branch).await,
+            // TODO
+            // Self::GitLab(repo) => gitlab::latest_commit(repo, branch).await,
+            Self::GitLab(repo) => github::latest_commit(repo, branch).await,
         }
     }
 }
@@ -31,6 +34,12 @@ fn split_git_repo_url(url: &str) -> Result<(String, String), GitRepoSpecError> {
     let re = Regex::new(r"(https?:\/\/|git@)(?<provider>[^\/]+)\/(?<path>.*)").unwrap();
     let caps = re.captures(url).ok_or(GitRepoSpecError::Invalid)?;
     Ok((caps["provider"].to_string(), caps["path"].to_string()))
+}
+
+fn split_owner_repo(path: &str) -> Result<(String, String), GitRepoSpecError> {
+    let re = Regex::new(r"(?<owner>[^\/]+)\/(?<repo>.*)").unwrap();
+    let caps = re.captures(path).ok_or(GitRepoSpecError::Invalid)?;
+    Ok((caps["owner"].to_string(), caps["repo"].to_string()))
 }
 
 impl<'de> Deserialize<'de> for Repo {
