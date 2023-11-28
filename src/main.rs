@@ -6,7 +6,10 @@ async fn main() {
     let config = config::get();
     let port = config.port;
     // build our application with a single route
-    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
+    let app = Router::new().route(
+        "/",
+        get(|| async { config.git_repo.latest_commit(config.git_branch.as_str()) }),
+    );
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}"))
