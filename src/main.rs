@@ -1,10 +1,13 @@
 use axum::{routing::get, Router};
 use mitblob::config;
+use tracing::info;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
     let config = config::get();
     let port = config.port;
+    info!("port = {port}");
     // build our application with a single route
     let app = Router::new().route(
         "/",
@@ -17,8 +20,10 @@ async fn main() {
         }),
     );
 
+    let bind_address = "0.0.0.0";
+    info!("Binding on {bind_address}:{port}");
     // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}"))
+    let listener = tokio::net::TcpListener::bind(format!("{bind_address}:{port}"))
         .await
         .unwrap();
     axum::serve(listener, app).await.unwrap();
