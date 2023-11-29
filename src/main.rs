@@ -1,5 +1,8 @@
 use axum::{routing::get, Router};
-use mitblob::config;
+use mitblob::{
+    blob::{get_sha, put_sha},
+    config,
+};
 use tracing::info;
 
 #[tokio::main]
@@ -9,16 +12,22 @@ async fn main() {
     let port = config.port;
     info!("port = {port}");
     // build our application with a single route
-    let app = Router::new().route(
-        "/",
-        get(|| async {
-            config
-                .git_repo
-                .latest_commit(config.git_branch.as_str())
-                .await
-                .unwrap_or_else(|e| e.to_string())
-        }),
-    );
+    let app = Router::new()
+        .route(
+            "/",
+            get(|| async {
+                config
+                    .git_repo
+                    .latest_commit(config.git_branch.as_str())
+                    .await
+                    .unwrap_or_else(|e| e.to_string())
+            }),
+        )
+        .route(
+            "/:sha",
+            // TODO https://docs.rs/axum/latest/axum/#using-the-state-extractor
+            get(get_sha).put(put_sha),
+        );
 
     let bind_address = "0.0.0.0";
     info!("Binding on {bind_address}:{port}");
