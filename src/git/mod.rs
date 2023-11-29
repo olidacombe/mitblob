@@ -17,9 +17,7 @@ impl Repo {
     pub async fn latest_commit(&self, branch: &str) -> Result<String> {
         match self {
             Self::GitHub(repo) => github::latest_commit(repo, branch).await,
-            // TODO
-            // Self::GitLab(repo) => gitlab::latest_commit(repo, branch).await,
-            Self::GitLab(repo) => github::latest_commit(repo, branch).await,
+            Self::GitLab(repo) => gitlab::latest_commit(repo, branch).await,
         }
     }
 }
